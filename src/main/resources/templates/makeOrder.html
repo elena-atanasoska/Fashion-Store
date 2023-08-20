@@ -1,0 +1,198 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <title>Make Order</title>
+    <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet"  th:href="@{/styles/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+
+        <div class="navbar">
+            <div class="logo">
+                <a th:href="@{/home}"><img src="../images/logo.png" width="200px"></a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a th:href="@{/home}">Home</a></li>
+                    <li><a th:href="@{/products}">Products</a></li>
+                    <li><a th:href="@{/orders}"  sec:authorize="hasRole('ROLE_USER')">My Orders</a></li>
+                    <li><a th:href="@{/postman/orders}" sec:authorize="hasRole('ROLE_POSTMAN')">Postman Orders</a></li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()"><a href="/login">Login</a></li>
+<!--                    sec:authorize="isAuthenticated()"-->
+                    <li><a th:href="@{/shoppingCart}" sec:authorize="hasRole('ROLE_USER')"><img src="../images/kosnicka.png" width="30px" height="30px"></a></li>
+                    <li class="dropdown" sec:authorize="isAuthenticated()">
+                        <div><i class="fas fa-caret-down"  style="font-size: 30px;color: #555555;"></i></div>
+                        <div class="dropdown-content">
+                            <a href="/voucher" sec:authorize="hasRole('ROLE_ADMIN')">Create voucher</a>
+                            <a href="/create-account" sec:authorize="hasRole('ROLE_ADMIN')">Create account</a>
+                            <a href="/admin-calendar" sec:authorize="hasRole('ROLE_ADMIN')">Create event</a>
+                            <a href="/logout" sec:authorize="isAuthenticated()">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+
+
+    </div>
+</div>
+
+<!--------- featured products ------->
+<div class="small-container">
+
+    <h2 class="title">Products</h2>
+
+    <div class="row">
+
+        <div class="col-4"th:each="product : ${products}">
+                <i th:text="${product.getClothes().description}"></i>
+                <img th:src="${product.getClothes().getImage()}" >
+            </br>
+        </div>
+
+    </div>
+
+
+    <h2 class="title">Order Data</h2>
+    <form th:action="@{/makeOrder/discountPrice}">
+    <div class="row">
+
+            <div class="col-4">
+                <p>Name
+                    </br>
+                <input th:value="(${name} != null ? ${name} : '')" name="name" type="text" required/>
+                </p>
+                </br>
+                <p>Surname
+                    </br>
+                    <input th:value="(${surname} != null ? ${surname} : '')" name="surname" type="text" required />
+                </p>
+                </br>
+                <p>Address
+                </br>
+                    <input th:value="(${address} != null ? ${address} : '')" name="address" type="text" required/>
+                </p>
+                </br>
+                <p>City
+                    </br>
+<!--                    <input th:value="(${city} != null ? ${city} : '')" name="city" type="text" required/>-->
+                    <select name="city" style="margin-top:25px;" id="select">
+                        <option th:if="${city} != null" th:value="(${city} != null ? ${city} : '')" th:selected="${city}" th:text="${city}"></option>
+                        <option th:value="NewYork" th:text="NewYork"></option>
+                        <option th:value="Paris" th:text="Paris"></option>
+                        <option th:value="TelAviv" th:text="TelAviv"></option>
+                        <option th:value="SanFrancisco" th:text="SanFrancisco"></option>
+                        <option th:value="Berlin" th:text="Berlin"></option>
+                        <option th:value="Amsterdam" th:text="Amsterdam"></option>
+                        <option th:value="Rome" th:text="Rome"></option>
+                    </select>
+                </p>
+                </br>
+                <p>Telephone
+                    <input th:value="(${telephone} != null ? ${telephone} : '')" name="telephone" type="text" required/>
+                </p>
+                </br>
+                <p>Card number
+                    <input th:value="(${card} != null ? ${card} : '')" name="card" type="text" required/>
+                </p>
+                </br>
+            </div>
+
+
+            <div>
+                <p>Price without discount
+                    </br>
+                    <input name="total" type="text" th:value="${total}" readonly/>
+                </p>
+                </br>
+                <p>Enter voucher code to get discount
+                    </br>
+                    <input th:value="(${voucher} != null ? ${voucher} : '')" name="voucher" type="text">
+                    <div th:if="${error}" th:text="${error}" style="background-color: transparent; font-size: smaller; color: red" readonly></div>
+                </p>
+                </br>
+                <button class="btn" type="submit">
+                    <i>Calculate discount</i>
+                </button>
+
+                </br>
+                <p >Final price with discount
+                    </br>
+                    <input name="discount" type="text"  th:value="(${discount} != null ? ${discount} : '')" readonly/>
+                </p>
+                <button th:formmethod="POST" th:formaction="@{/purchase}" class="btn" type="submit">
+                    <i>BUY</i>
+                </button>
+            </div>
+    </div>
+    </form>
+
+</div>
+
+<!------------ footer ---------->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col-1">
+                <h3>Download Our App</h3>
+                <p>Download App for Android and iOS mobile phone.</p>
+                <div class="app-logo">
+                    <img src="../images/playstore.png">
+                    <img src="../images/appstore.png">
+                </div>
+            </div>
+            <div class="footer-col-2">
+                <img src="../images/logo-footer.png" width="150px">
+                <p>Our Purpose Is To Sustainably Make The Pleasure and Benefits of Products Acessible to the Many.</p>
+            </div>
+            <div class="footer-col-3">
+                <h3>Useful Links</h3>
+                <ul>
+                    <li><a href="">Coupons</a></li>
+                    <li><a href="">Blog Post</a></li>
+                    <li><a href="">Return Policy</a></li>
+                    <li><a href="">Join Affiliate</a></li>
+                </ul>
+            </div>
+            <div class="footer-col-4">
+                <h3>Follow us</h3>
+                <ul>
+                    <li><a href="https://www.facebook.com/">Facebook</a></li>
+                    <li><a href="https://twitter.com/?lang=en">Twitter</a></li>
+                    <li><a href="https://www.instagram.com/">Instagram</a></li>
+                    <li><a href="https://www.youtube.com/">YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <p class="copyright">Copyright 2023 - Fashion Store &#169;</p>
+    </div>
+</div>
+
+<!------------------ js for toggle menu ------>
+<script>
+    var MenuItems = document.getElementById("MenuItems");
+
+    MenuItems.style.maxHeight = "0px";
+
+    function menutoggle(){
+        if(MenuItems.style.maxHeight == "0px"){
+            MenuItems.style.maxHeight = "200px";
+        }
+        else{
+            MenuItems.style.maxHeight = "0px";
+        }
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Store</title>
+    <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet"  th:href="@{/styles/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        .welcome-message {
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+            color: #be308d;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+        .add-item{
+            color: white;
+        }
+
+        .edit-item{
+            color: white;
+        }
+
+        .kopce{
+            margin-top: -20px ;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+
+        <div class="navbar">
+            <div class="logo">
+                <a th:href="@{/home}"><img src="../images/logo.png" width="200px"></a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a th:href="@{/home}">Home</a></li>
+                    <li><a th:href="@{/products}">Products</a></li>
+
+                    <li><a th:href="@{/orders}"  sec:authorize="hasRole('ROLE_USER')">My Orders</a></li>
+                    <li><a th:href="@{/postman/orders}" sec:authorize="hasRole('ROLE_POSTMAN')">Postman Orders</a></li>
+
+                    <li class="nav-item" sec:authorize="!isAuthenticated()"><a href="/login">Login</a></li>
+<!--                    sec:authorize="isAuthenticated()"-->
+                    <li><a id="shoppingcart" th:href="@{/shoppingCart}" sec:authorize="hasRole('ROLE_USER')" ><img src="../images/kosnicka.png" width="30px" height="30px"></a></li>
+                    <li class="dropdown" sec:authorize="isAuthenticated()">
+                        <div><i class="fas fa-caret-down"  style="font-size: 30px;color: #555555;"></i></div>
+                        <div class="dropdown-content">
+                            <a href="/voucher" sec:authorize="hasRole('ROLE_ADMIN')">Create voucher</a>
+                            <a href="/create-account" sec:authorize="hasRole('ROLE_ADMIN')">Create account</a>
+                            <a href="/admin-calendar" sec:authorize="hasRole('ROLE_ADMIN')">Create event</a>
+                            <a href="/logout" sec:authorize="isAuthenticated()">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+
+<!--------- products ------->
+<div class="small-container">
+    <h2 class="title">All Products</h2>
+    <h3 th:if="${#request.getRemoteUser() != null}" class="welcome-message">We wish you pleasant shopping <th:block th:if="${#request.getRemoteUser() != null}" th:text="${#request.getRemoteUser()}"></th:block>!</h3>
+    <div class="row row-2">
+        <!-- <h2>Products</h2> -->
+        <div class="col">
+            <form th:action="@{'/products/searchProducts'}" th:method="GET" id="filter-form">
+            <label for="nameSearch"></label>
+            <input id="nameSearch" type="text" name="nameSearch" placeholder="Enter product name" required><button class="btn" type="submit" id="filter">Search</button>
+        </form></div>
+
+        <div style="display: flex;align-items: center;" class="col">
+       Sort by:&nbsp;
+        <li class="dropdown">
+            <div><i class="fas fa-chevron-circle-down"  style="font-size: 30px;color: #b3017de0;"></i></div>
+            <div class="dropdown-content">
+                <a th:href="@{'/products/page/' + ${currentPage} + '?sortField=dateCreated&sortDir=desc' }" id="latest-sort" class="sort">Latest</a>
+                <a th:href="@{'/products/page/' + ${currentPage} + '?sortField=name&sortDir=asc'}" id="name-sort" class="sort">Name</a>
+                <a th:href="@{'/products/page/' + ${currentPage} + '?sortField=price&sortDir=asc'}" id="price-sort" class="sort">Price</a>
+                <a th:href="@{'/products/page/' + ${currentPage} + '?sortField=grade&sortDir=desc'}" id="rating-sort" class="sort">Rating</a>
+
+        </div>
+        </li>
+        </div>
+
+
+    </div>
+    <button sec:authorize="hasRole('ROLE_ADMIN')" class="btn add-product-btn" type="submit" ><a th:href="@{/products/add}" class="add-item">Add new product
+    </a></button>
+
+    <p>
+    <div th:if="${error}" th:text="${error}" style="background-color: transparent; font-size: smaller; color: red; text-align: center" readonly></div>
+    </p>
+    </br>
+    </br>
+
+    <div class="row" >
+
+        <div id="prr" class="col-4"  th:each="p : ${products}">
+            <a th:href="@{/products/{id} (id=${p.getId()})}"><img th:src="${p.image}"></a>
+            <a th:href="@{/products/{id} (id=${p.getId()})}"><h4 th:text="${p.name}" th:href="@{/product-details}"></h4></a>
+<!--            TUKA DA SE NAPRAVAT DA SVETNAT ONOLKU DZVEZDICKI KOLKU STO E OCENATA ZA TOJ PRODUKT!-->
+            <div class="rating">
+                <i th:each="i : ${#numbers.sequence(1, p.getGrade())}" class="fa fa-star" aria-hidden="true"></i>
+            </div>
+            <p th:text="'$' + ${p.price}"></p>
+
+           <button sec:authorize="hasRole('ROLE_ADMIN')" class="btn" type="submit"><a th:href="@{/products/{id}/edit (id=${p.getId()})}" class="edit-item">Edit</a></button>
+            <form sec:authorize="hasRole('ROLE_ADMIN')" class="kopce" th:action="@{/products/delete/{id} (id=${p.getId()})}" th:method="POST"><button type="submit" class="btn" id="delete-product">Delete</button></form>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="pagination">
+
+        <a th:if="${currentPage > 1}" th:href="@{'/products/page/1?sortField=' + ${sortField} +'&sortDir=' + ${sortDir}}">First</a>
+        <span th:unless="${currentPage > 1}">First</span>
+
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage > 1}" th:href="@{'/products/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} +'&sortDir=' + ${sortDir}}">Previous</a>
+        <span th:unless="${currentPage > 1}">Previous</span>
+        &nbsp;&nbsp;
+
+
+        <span class="page-btn" th:each="i: ${#numbers.sequence(1, totalPages)}">
+           <a th:if="${i != currentPage}" th:href="@{'/products/page/' + ${i}} + '?sortField=' + ${sortField} +'&sortDir=' + ${sortDir}"><p>[[${i}]]</p></a>
+           <span th:unless="${i != currentPage}"><p>[[${i}]]</p></span>
+            &nbsp;&nbsp;
+        </span>
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/products/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} +'&sortDir=' + ${sortDir}}">Next</a>
+        <span th:unless="${currentPage < totalPages}">Next</span>
+
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/products/page/' + ${totalPages} + '?sortField=' + ${sortField} +'&sortDir=' + ${sortDir}}">Last</a>
+        <span th:unless="${currentPage < totalPages}">Last</span>
+    </div>
+
+</div>
+
+
+
+<!------------ footer ---------->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col-1">
+                <h3>Download Our App</h3>
+                <p>Download App for Android and iOS mobile phone.</p>
+                <div class="app-logo">
+                    <img src="../images/playstore.png">
+                    <img src="../images/appstore.png">
+                </div>
+            </div>
+            <div class="footer-col-2">
+                <img src="../images/logo-footer.png" width="150px">
+                <p>Our Purpose Is To Sustainably Make The Pleasure and Benefits of Products Acessible to the Many.</p>
+            </div>
+            <div class="footer-col-3">
+                <h3>Useful Links</h3>
+                <ul>
+                    <li><a href="">Coupons</a></li>
+                    <li><a href="">Blog Post</a></li>
+                    <li><a href="">Return Policy</a></li>
+                    <li><a href="">Join Affiliate</a></li>
+                </ul>
+            </div>
+            <div class="footer-col-4">
+                <h3>Follow us</h3>
+                <ul>
+                    <li><a href="https://www.facebook.com/">Facebook</a></li>
+                    <li><a href="https://twitter.com/?lang=en">Twitter</a></li>
+                    <li><a href="https://www.instagram.com/">Instagram</a></li>
+                    <li><a href="https://www.youtube.com/">YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <p class="copyright">Copyright 2023 - Fashion Store &#169;</p>
+    </div>
+</div>
+
+<!------------------ js for toggle menu ------>
+<script>
+    var MenuItems = document.getElementById("MenuItems");
+
+    MenuItems.style.maxHeight = "0px";
+
+    function menutoggle(){
+        if(MenuItems.style.maxHeight == "0px"){
+            MenuItems.style.maxHeight = "200px";
+        }
+        else{
+            MenuItems.style.maxHeight = "0px";
+        }
+    }
+
+</script>
+
+</body>
+</html>
