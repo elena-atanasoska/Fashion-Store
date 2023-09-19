@@ -7,7 +7,8 @@ describe('template spec', () => {
         addtoCart.navigateToPage('http://localhost:9090/login');
         addtoCart.login("elena", "elena");
         addtoCart.verifyUserSuccessfullyLogin();
-        addtoCart.addItem();
+        addtoCart.addItem('#2');
+        addtoCart.confirm();
         addtoCart.deleteItem();
     });
 });

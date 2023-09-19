@@ -10,7 +10,7 @@ export class AddItem {
 
     static get AddItemElement(){
         return{
-            getItem: () =>cy.get('#2'),
+            getItem: (id: string) =>cy.get(id),
             getAddButton: () => cy.get('body > div.small-container.single-product > div > div:nth-child(2) > form:nth-child(4) > button'),
             getMessage: () => cy.get('body > div.small-container.cart-page > table > tbody > tr:nth-child(2) > td:nth-child(2)')
         }

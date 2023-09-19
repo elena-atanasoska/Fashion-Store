@@ -12,9 +12,11 @@ export class AddItemMethods{
     verifyUserSuccessfullyLogin(){
         AddItem.LoginFormElement.getBtnMyOrders().should('exist');
     }
-    addItem(){
-        AddItem.AddItemElement.getItem().click();
+    addItem(id: string){
+        AddItem.AddItemElement.getItem(id).click();
         AddItem.AddItemElement.getAddButton().click();
+    }
+    confirm(){
         AddItem.AddItemElement.getMessage().should('have.text', '1');
     }
     deleteItem(){
