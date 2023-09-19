@@ -112,7 +112,7 @@
 
     <div class="row" >
 
-        <div id="prr" class="col-4"  th:each="p : ${products}">
+        <div th:id="${p.getId()}" class="col-4"  th:each="p : ${products}">
             <a th:href="@{/products/{id} (id=${p.getId()})}"><img th:src="${p.image}"></a>
             <a th:href="@{/products/{id} (id=${p.getId()})}"><h4 th:text="${p.name}" th:href="@{/product-details}"></h4></a>
 <!--            TUKA DA SE NAPRAVAT DA SVETNAT ONOLKU DZVEZDICKI KOLKU STO E OCENATA ZA TOJ PRODUKT!-->
