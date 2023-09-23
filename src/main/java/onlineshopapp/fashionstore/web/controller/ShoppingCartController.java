@@ -40,7 +40,7 @@ public class ShoppingCartController {
             for(OrderedClothes c : this.shoppingCartService.listAllProductsInShoppingCart(shoppingCart.getId()))
                 total += c.getPrice();
             model.addAttribute("products", this.shoppingCartService.listAllProductsInShoppingCart(shoppingCart.getId()));
-            model.addAttribute("bodycContents", "shoppingCart");
+            model.addAttribute("bodyContents", "shoppingCart");
             model.addAttribute("total", total);
         }
         else{
